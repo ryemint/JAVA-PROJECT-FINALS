@@ -1,0 +1,170 @@
+
+
+import java.util.ArrayList;
+import java.util.Scanner;
+class Cart { 
+    private ArrayList<String> items = new ArrayList<>();
+    private ArrayList<Integer> itemQty = new ArrayList<>();
+    private Scanner input = new Scanner(System.in); 
+    static double grandTotal = 0.0;
+    static int removeItems;
+    
+    public void addItem(MenuItem item, int qty) {
+        // TO GET THE TOTAL
+        double total = 0.0;
+        //double productPrice = itemQty.get(qty) * item.getPrice();
+        double productPrice = qty * item.getPrice();
+        total += productPrice;
+        grandTotal += productPrice;
+        
+        itemQty.add(qty);
+        items.add(qty + "x " + item.getName() + "\t@" + item.getPrice() + "\t\t" + total);
+        System.out.println("Added to cart!");
+    }
+    
+    public void displayCart() {
+        System.out.println("\n--- Your Cart ---");
+        if (items.isEmpty()) {
+            System.out.println("Cart is empty.");       
+        } else {
+           
+        // modify to print 1.) 2.)
+            System.out.println("Qty and Product \t Unit \t Total");
+            for(int i = 0; i < items.size(); i++){       
+                System.out.println("[" + i + "]. "+ items.get(i));
+            }
+            FINAL_PROJECT_COLLAB.chooseActionInCart(this);
+         
+        }
+    }
+    
+    public void removeItem(){
+ 
+        System.out.print("\nWould you like to remove an item? (y/n): ");
+        String readRemove = input.nextLine();
+        char boolRemove = readRemove.charAt(0);
+        
+        if(boolRemove == 'y' || boolRemove == 'Y'){
+            System.out.println("Select a number to remove (from 0 up to last number): ");
+            removeItems = input.nextInt();
+            input.nextLine();
+            
+            //condition to user input
+            if (removeItems >= 0 && removeItems < items.size()){
+                items.remove(removeItems);
+                //DISPLAY THIS once cart is empty
+                
+                if(items.isEmpty()){
+                    System.out.println("Your cart is empty! ");
+                } else {
+                    displayCart();                
+                }
+            } else {
+                System.out.println("Invalid. Try again.");
+                removeItem();
+            }
+        }else if(boolRemove == 'n' || boolRemove == 'N'){
+            //dapat babalik sa choose action
+           //checkOutItem();
+            FINAL_PROJECT_COLLAB.chooseActionInCart(this);
+        } else {
+            System.out.println("Invalid!");
+        }
+
+    }
+ 
+ 
+    public void editItem(){
+        System.out.println("---TAKE NOTE: this can only edit quantity.---");
+        System.out.println("\nEnter index of an item that you would like to edit.");
+        int editIndexItem = input.nextInt();
+        
+        if(editIndexItem >= 0 && editIndexItem <= items.size()){
+            System.out.println("Enter the quantity");
+            int editQty = input.nextInt();   
+            //allow the user to edit quantity of an item
+            itemQty.set(editIndexItem, editQty);
+            // for printing purposes
+            // hindi niya na-uupdate yung price
+            String updatedItem = editQty + "x " + items.get(editIndexItem);
+            items.set(editIndexItem, updatedItem);
+            System.out.println(items);
+            // padisplay yung new cart
+            // mukha lang niyang napapalitan pero di niya talaga napapalitan
+            /* ang nangyayari
+            your cart: 7x mealdescription
+            enter quantity: 1
+            output: 1x 7x meal description
+            */
+        } else {
+            System.out.println("Invalid index. Try again");
+            editItem();
+        }
+    }
+    
+    public void confirmCart(){
+        System.out.println("Product \t\t\t Price");
+        for (String itemList : items) {
+                System.out.println(itemList);
+        }
+            
+         // TO GET THE TOTAL
+        
+         /*
+        //@Override the new total (kasi nagremove)
+        double total = 0.0;
+        //double productPrice = itemQty.get(qty) * item.getPrice();
+        double productPrice = qty * item.getPrice();
+        total += productPrice;
+        grandTotal += productPrice;
+        
+        itemQty.add(qty);
+
+        
+        //grandTotal += productPrice;             
+        System.out.println("Total: " + grandTotal); 
+*/
+    }
+    
+    public void receipt(){
+        System.out.println("***************************************************");
+        System.out.println("\n\t\tMCBytes Restaurant");
+        System.out.println("***************************************************");
+        
+        System.out.println("User info");
+        System.out.println("address");
+        
+        confirmCart();
+        System.out.println("***************************************************");
+        
+    }
+    public void checkOutItem(){
+        String readOrder;
+        char boolOrder;
+       
+        System.out.print("Would you like to check out the items? ");
+        readOrder = input.nextLine();
+        boolOrder = readOrder.charAt(0);
+        
+        if(boolOrder == 'y' || boolOrder == 'Y'){
+            System.out.println("\n--Confirm your order--");
+            
+            System.out.println("Would you like to buy the items? (y/n) ");
+            char buyItem = input.next().charAt(0);
+            
+            if(buyItem == 'y' || buyItem == 'Y'){
+                System.out.println("\nHere's your buy list!\n");
+                confirmCart();
+                //gawa ng for loop kineme
+                receipt();
+            } else {
+                System.out.println("Invalid Option!");
+            }
+        } else if (boolOrder == 'n' || boolOrder == 'N'){
+            FINAL_PROJECT_COLLAB.MainMenu(this);
+        } else {
+            System.out.println("Invalid option!");
+        }
+    }
+ 
+}
