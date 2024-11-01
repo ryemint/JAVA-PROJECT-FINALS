@@ -1,52 +1,62 @@
 
-
 import java.util.ArrayList;
 import java.util.Scanner;
-class Cart { 
-    private ArrayList<String> items = new ArrayList<>();
-    private ArrayList<Integer> itemQty = new ArrayList<>();
-    private Scanner input = new Scanner(System.in); 
-    static double grandTotal = 0.0;
-    static int removeItems;
+
+class CART {
+    //siyempre declaration muna ni registration. galing mo naman pag deretso initialize
+   public Registration registration;
+   
+   private ArrayList<String> items = new ArrayList<>();
+   private ArrayList<MenuItem> menuItems = new ArrayList<>(); // para makuha yung laman doon sa menu item
+   private ArrayList<Integer> itemQty = new ArrayList<>();
+   private ArrayList<ArrayList<String>> orderHistory = new ArrayList<>(); // List of all past receipts
+   private ArrayList <Double> itemPrice = new ArrayList<>();
+   
+   private Scanner input = new Scanner(System.in); 
+   static double total = 0.0;
+   static double finalGrandTotal = 0.0;
+   static double finalVat = 0.0;
+   static String buyItem;
+  
+   //initialize and instantiate registration
+   // para mapasok or makuha yung mga parameters / in general makuha yung sa registration class
+   public CART (Registration registration){
+       this.registration = registration;       
+   }
+   
+   public void addItem(MenuItem item, int qty) {
+      
+       double productPrice = qty * item.getPrice(); 
+       itemPrice.add(productPrice);
+       total += productPrice;
+       
+       itemQty.add(qty); // add qty malamang
+       menuItems.add(item); // kaya tayo may ganiyan kasi kinukuha niya yung laman doon sa kabilang class tapos para makuha yung new total kapag madami kang update
+       items.add(qty + "x " + item.getName() + "\t@" + item.getPrice() + "\t\t" + productPrice);
+       System.out.println("Added to cart!");
+   }
     
-    public void addItem(MenuItem item, int qty) {
-        // TO GET THE TOTAL
-        double total = 0.0;
-        //double productPrice = itemQty.get(qty) * item.getPrice();
-        double productPrice = qty * item.getPrice();
-        total += productPrice;
-        grandTotal += productPrice;
-        
-        itemQty.add(qty);
-        items.add(qty + "x " + item.getName() + "\t@" + item.getPrice() + "\t\t" + total);
-        System.out.println("Added to cart!");
-    }
+   public void displayCart() {
+       System.out.println("\n--------------- Your Cart ----------------");
+       if (items.isEmpty()) {
+           System.out.println("Cart is empty.");
+       } else {
+           System.out.println("Qty and Product \t Unit \t Total");
+           for(int i = 0; i < items.size(); i++){       
+               System.out.println("[" + i + "]. "+ items.get(i));
+           }
+           FINAL_PROJECT_COLLAB.chooseActionInCart(this);
+       }
+   }
     
-    public void displayCart() {
-        System.out.println("\n--- Your Cart ---");
-        if (items.isEmpty()) {
-            System.out.println("Cart is empty.");       
-        } else {
-           
-        // modify to print 1.) 2.)
-            System.out.println("Qty and Product \t Unit \t Total");
-            for(int i = 0; i < items.size(); i++){       
-                System.out.println("[" + i + "]. "+ items.get(i));
-            }
-            FINAL_PROJECT_COLLAB.chooseActionInCart(this);
-         
-        }
-    }
-    
-    public void removeItem(){
- 
+   
+       public void removeItem(){
         System.out.print("\nWould you like to remove an item? (y/n): ");
-        String readRemove = input.nextLine();
-        char boolRemove = readRemove.charAt(0);
+        String boolRemove = input.nextLine();
         
-        if(boolRemove == 'y' || boolRemove == 'Y'){
-            System.out.println("Select a number to remove (from 0 up to last number): ");
-            removeItems = input.nextInt();
+        if(boolRemove.equalsIgnoreCase("Y")){
+            System.out.print("Select a number to remove (from 0 up to " + (items.size() - 1) + "): ");
+            int removeItems = input.nextInt();
             input.nextLine();
             
             //condition to user input
@@ -63,108 +73,148 @@ class Cart {
                 System.out.println("Invalid. Try again.");
                 removeItem();
             }
-        }else if(boolRemove == 'n' || boolRemove == 'N'){
-            //dapat babalik sa choose action
-           //checkOutItem();
+        }else if(boolRemove.equalsIgnoreCase("N")){   
             FINAL_PROJECT_COLLAB.chooseActionInCart(this);
         } else {
             System.out.println("Invalid!");
         }
 
     }
- 
- 
-    public void editItem(){
-        System.out.println("---TAKE NOTE: this can only edit quantity.---");
-        System.out.println("\nEnter index of an item that you would like to edit.");
-        int editIndexItem = input.nextInt();
-        
-        if(editIndexItem >= 0 && editIndexItem <= items.size()){
-            System.out.println("Enter the quantity");
-            int editQty = input.nextInt();   
-            //allow the user to edit quantity of an item
-            itemQty.set(editIndexItem, editQty);
-            // for printing purposes
-            // hindi niya na-uupdate yung price
-            String updatedItem = editQty + "x " + items.get(editIndexItem);
-            items.set(editIndexItem, updatedItem);
-            System.out.println(items);
-            // padisplay yung new cart
-            // mukha lang niyang napapalitan pero di niya talaga napapalitan
-            /* ang nangyayari
-            your cart: 7x mealdescription
-            enter quantity: 1
-            output: 1x 7x meal description
-            */
-        } else {
-            System.out.println("Invalid index. Try again");
-            editItem();
-        }
-    }
-    
-    public void confirmCart(){
-        System.out.println("Product \t\t\t Price");
-        for (String itemList : items) {
-                System.out.println(itemList);
-        }
-            
-         // TO GET THE TOTAL
-        
-         /*
-        //@Override the new total (kasi nagremove)
-        double total = 0.0;
-        //double productPrice = itemQty.get(qty) * item.getPrice();
-        double productPrice = qty * item.getPrice();
-        total += productPrice;
-        grandTotal += productPrice;
-        
-        itemQty.add(qty);
-
-        
-        //grandTotal += productPrice;             
-        System.out.println("Total: " + grandTotal); 
-*/
-    }
-    
-    public void receipt(){
-        System.out.println("***************************************************");
-        System.out.println("\n\t\tMCBytes Restaurant");
-        System.out.println("***************************************************");
-        
-        System.out.println("User info");
-        System.out.println("address");
-        
-        confirmCart();
-        System.out.println("***************************************************");
-        
-    }
-    public void checkOutItem(){
-        String readOrder;
-        char boolOrder;
        
-        System.out.print("Would you like to check out the items? ");
-        readOrder = input.nextLine();
-        boolOrder = readOrder.charAt(0);
+   public void editItem(){
+       System.out.println("\n---NOTE: This can only edit quantity.---");
+       System.out.print("\nEnter the number of an item that you'd like to edit (from 0 to " + (items.size() - 1) + "): ");
+       int editIndexItem = input.nextInt();
         
-        if(boolOrder == 'y' || boolOrder == 'Y'){
-            System.out.println("\n--Confirm your order--");
+       if(editIndexItem >= 0 && editIndexItem < items.size()){
+           System.out.print("Enter the new quantity: ");
+           int editQty = input.nextInt();   
+           
+           // PARA MAUPDATE YUNG NEW PRICE KAPAG NAG-EDIT KA    
+           double oldProductPrice = itemQty.get(editIndexItem) * menuItems.get(editIndexItem).getPrice();
+           double newProductPrice = editQty * menuItems.get(editIndexItem).getPrice();
+           total += (newProductPrice - oldProductPrice);
+           
+           itemQty.set(editIndexItem, editQty);
+           String updatedItem = editQty + "x " + menuItems.get(editIndexItem).getName() 
+               + "\t@" + menuItems.get(editIndexItem).getPrice() 
+               + "\t\t" + newProductPrice;
+           items.set(editIndexItem, updatedItem);
+           System.out.println("\nUpdated Cart: ");
+           confirmCart();
+       } else {
+           System.out.println("Invalid index. Try again.");
+           editItem();
+       }
+   }
+   
+   
+   public void confirmCart(){
+       System.out.println("Product \t\t\t Price");
+       for (String itemList : items) {
+           System.out.println(itemList);
+       }
+   }
+   
+   public void checkOutItem(){
+       System.out.print("Would you like to check out the items? (y/n): ");
+       String boolOrder = input.nextLine();
+    
+       if(boolOrder.equalsIgnoreCase("Y")){
+           System.out.println("\n------------ ORDER CONFIRMATION -------------");
             
-            System.out.println("Would you like to buy the items? (y/n) ");
-            char buyItem = input.next().charAt(0);
+           System.out.print("Would you like to buy the items? (y/n):  ");    
+           buyItem = input.nextLine();
             
-            if(buyItem == 'y' || buyItem == 'Y'){
-                System.out.println("\nHere's your buy list!\n");
-                confirmCart();
-                //gawa ng for loop kineme
-                receipt();
-            } else {
-                System.out.println("Invalid Option!");
+           if(buyItem.equalsIgnoreCase("Y")){
+               ArrayList<String> receiptItems = new ArrayList<>(items); // Save current receipt items
+               ArrayList<Double> priceItems = new ArrayList<>();
+                orderHistory.add(receiptItems); // Save to order history
+                finalGrandTotal = total; // Save the total
+                finalVat = total * 0.12;
+                
+               receipt();
+               items.clear();
+
+               menuItems.clear();
+               itemQty.clear();
+               itemPrice.clear();
+               total = 0.0;
+           } else {
+               System.out.println("Invalid Option!");
+           }
+       } else if (boolOrder.equalsIgnoreCase("N")){
+           FINAL_PROJECT_COLLAB.MainMenu(this);
+       } else {
+           System.out.println("Invalid option!");
+       }
+   }
+   
+   public void receipt(){
+       System.out.println("\n*****Here's your receipt!*****");
+       System.out.println("\n***************************************************");
+       System.out.println("\n\t\tMCBytes Restaurant");
+       System.out.println("\n***************************************************");
+
+       //PARA MAKUHA YUNG USER INFO
+       System.out.println("\nUser's name: " + registration.getFirstName());
+       System.out.println("Address: " + registration.getAddress());
+       System.out.println("Number: " + registration.getPhoneNumber() + "\n");
+       System.out.println("Product \t\t Price");
+       for(String itemList: items){
+           System.out.println(itemList);
+       }
+
+       System.out.println("\n***************************************************");
+
+       double vat = total * 0.12;
+       double grandTotal = total + vat;
+       
+       itemPrice.add(grandTotal);
+       itemPrice.add(vat);
+       System.out.printf("\nTotal:\t\t%.2f\n", total);
+       System.out.printf("VAT (12%%):\t%.2f\n", vat);
+       System.out.printf("Grand Total:\t%.2f\n", grandTotal);
+
+       System.out.println("\n***************************************************");
+       System.out.println("\tThank you for dining with us!"); 
+       
+   }
+   
+    public void myOrders() {
+        if(orderHistory.isEmpty()){
+           System.out.println("You have no orders!");
+       } else if (buyItem == null){
+           System.out.println("Check out your items first!");
+
+       } else if (buyItem.equalsIgnoreCase("Y")) {
+            System.out.println("\n--------------- Your Cart ----------------");
+            
+            for (int i = 0; i < orderHistory.size(); i++) {
+            System.out.println("\nOrder #" + (i + 1) + ":");
+            System.out.println("Product \t\t\t Price");
+
+            double orderTotal = 0.0;
+
+            // Print each item in the order and calculate the order total
+            for (String itemList : orderHistory.get(i)) {
+                System.out.println(itemList);
+                
+                // Extract the price from the itemList string
+                String[] parts = itemList.split("\t+");
+                double itemPrice = Double.parseDouble(parts[parts.length - 1]);
+                orderTotal += itemPrice;
             }
-        } else if (boolOrder == 'n' || boolOrder == 'N'){
-            FINAL_PROJECT_COLLAB.MainMenu(this);
-        } else {
-            System.out.println("Invalid option!");
-        }
-    }
- 
+           
+            double orderVAT = finalVat;
+            double grandTotal = orderTotal + orderVAT;
+            
+            System.out.printf("\nTotal:\t\t%.2f\n", orderTotal);
+            System.out.printf("VAT (12%%):\t%.2f\n", orderVAT);
+            System.out.printf("Grand Total:\t%.2f\n", grandTotal);
+
+           System.out.println("\n***************************************************");     
+       }        
+   }
+   }
 }
